@@ -1,0 +1,43 @@
+.update-prompt {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  /* Juste au-dessus de la barre « Ajouter une série » (.addbar-wrap dans style.css). */
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  max-width: 448px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 20;
+}
+.update-prompt-text {
+  font-size: 14px;
+  color: var(--ink);
+}
+.update-prompt-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.update-prompt-actions button {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.update-prompt-actions .update-prompt-confirm {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}

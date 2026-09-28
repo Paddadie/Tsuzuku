@@ -1,0 +1,6 @@
+node_modules
+dist
+.DS_Store
+
+# Notes de contexte locales, jamais poussées
+context.md

@@ -1,0 +1,826 @@
+/* Thème sombre par défaut. Le thème effectif est posé en data-theme sur <html> par le
+   script inline d'index.html puis par src/settings/theme.ts (le choix « Système » y est
+   résolu) : le CSS n'a donc qu'une seule variante claire à déclarer.
+   Direction visuelle : papier imprimé de manga (trame de points, vermillon, tampon hanko). */
+:root {
+  color-scheme: dark;
+  --paper: #1a1611;
+  --surface: #242019;
+  --surface-2: #2e2921;
+  --ink: #ede6d8;
+  --ink-soft: #a79e8c;
+  --border: #3a3226;
+  --manga: #ef6b55;
+  --manga-bg: rgba(239, 107, 85, 0.18);
+  --anime: #5ec4dc;
+  --anime-bg: rgba(94, 196, 220, 0.18);
+  --primary: #ede6d8;
+  --on-primary: #1a1611;
+  --danger: #ef6b55;
+  --dots: rgba(255, 255, 255, 0.06);
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --backdrop: rgba(0, 0, 0, 0.55);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --paper: #efe8d8;
+  --surface: #fffcf6;
+  --surface-2: #f6f0e3;
+  --ink: #1f1b16;
+  --ink-soft: #6b6457;
+  --border: #dbd1bd;
+  --manga: #d2432f;
+  --manga-bg: rgba(210, 67, 47, 0.12);
+  --anime: #16789a;
+  --anime-bg: rgba(22, 120, 154, 0.12);
+  --primary: #d2432f;
+  --on-primary: #ffffff;
+  --danger: #c2382a;
+  --dots: rgba(31, 27, 22, 0.11);
+  --shadow: 0 1px 2px rgba(80, 55, 25, 0.06), 0 8px 22px rgba(80, 55, 25, 0.1);
+  --backdrop: rgba(31, 27, 22, 0.45);
+}
+
+/* Couleurs d'accent par type de série : cartes, titres de section, choix du type. */
+[data-type="manga"] {
+  --tag-color: var(--manga);
+  --tag-bg: var(--manga-bg);
+}
+[data-type="anime"] {
+  --tag-color: var(--anime);
+  --tag-bg: var(--anime-bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
+html {
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Police arrondie du système (SF Pro Rounded sur iPhone et Mac), en écho aux cartes
+   et boutons arrondis ; Hiragino Maru Gothic pour les kanji. */
+.display {
+  font-family:
+    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--ink-soft);
+  outline-offset: 2px;
+}
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* ---------------------------------------------------------------- Pages */
+
+.page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Page Réglages : posée par-dessus la liste, elle glisse depuis la droite. */
+.page-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  background: var(--paper);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.2);
+}
+.slide-in {
+  animation: slide-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.slide-out {
+  animation: slide-out 0.25s ease-in forwards;
+}
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* En-tête avec une trame de points, comme les trames des planches de manga. */
+.app-header {
+  flex-shrink: 0;
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 20px 16px;
+  background:
+    radial-gradient(circle, var(--dots) 1.1px, transparent 1.7px) 0 0 / 9px 9px,
+    var(--paper);
+  border-bottom: 1px solid var(--border);
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-action {
+  margin-left: auto;
+}
+.app-header h1 {
+  font-size: 32px;
+  margin: 0;
+  line-height: 1;
+}
+.kanji {
+  font-size: 15px;
+  color: var(--manga);
+  font-weight: 400;
+}
+.header-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.icon-btn:active {
+  background: var(--surface-2);
+}
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+.back-btn {
+  margin-left: -10px;
+}
+
+.page-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+/* Place pour la barre d'ajout fixée en bas. */
+#list {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--tag-color, var(--ink-soft));
+  margin: 0 0 12px;
+}
+/* Compteur façon tampon japonais (hanko). */
+.section-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  letter-spacing: 0;
+  transform: rotate(-6deg);
+}
+.group .section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.25;
+}
+
+/* ---------------------------------------------------------------- Liste */
+
+.empty {
+  padding: 40px 10px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+/* Le chapeau de paille en filigrane. */
+.empty::before {
+  content: "";
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 8px;
+  background: var(--ink);
+  opacity: 0.14;
+  -webkit-mask: url("/icon.svg") center / contain no-repeat;
+  mask: url("/icon.svg") center / contain no-repeat;
+}
+.empty p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.group + .group {
+  margin-top: 28px;
+}
+
+/* Peu de séries suivies à la fois : des cartes généreuses plutôt qu'une liste dense.
+   Hauteur minimale commune pour que toutes les cartes aient la même taille, qu'elles
+   affichent une ligne de saison ou non (la plus haute, anime suivi par saison, en a besoin). */
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 140px;
+  margin-bottom: 14px;
+  padding: 22px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--tag-color);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease;
+}
+.card:has(.card-main:active) {
+  transform: scale(0.98);
+}
+.card-new {
+  animation:
+    card-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    card-flash 1.2s ease-out;
+}
+.card-flash {
+  animation: card-flash 1.2s ease-out;
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+@keyframes card-flash {
+  from {
+    box-shadow:
+      0 0 0 3px var(--tag-color),
+      var(--shadow);
+  }
+}
+/* Bouton « modifier » étendu sur toute la carte. Le contenu visible laisse passer les
+   touchers jusqu'à lui ; seuls les boutons d'action rapide les interceptent. */
+.card-main {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.card .icon,
+.card .body {
+  position: relative;
+  pointer-events: none;
+}
+.card .season-link,
+.card .plus1 {
+  pointer-events: auto;
+}
+.card .icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--tag-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.card .body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.title-wrap {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.title-text {
+  display: inline-block;
+  font-size: 19px;
+  font-weight: 600;
+}
+.title-text.marquee {
+  animation: marquee-scroll linear infinite;
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-1 * var(--mq-dist, 100px)));
+  }
+}
+/* Progression sous le titre, pour laisser toute la largeur au titre. */
+.card .progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+.card .progress-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.card .num {
+  display: inline-block;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--tag-color);
+}
+/* Anime suivi par saison : la saison en petit tampon devant l'épisode, et un lien
+   explicite pour passer à la saison suivante (épisode remis à 1, annulable). */
+.card .season-badge {
+  display: inline-grid;
+  place-items: center;
+  height: 24px;
+  padding: 0 7px;
+  border: 1.5px solid var(--tag-color);
+  border-radius: 7px;
+  color: var(--tag-color);
+  font-size: 13px;
+  font-weight: 700;
+  /* `rotate` plutôt que `transform` : le rebond (qui anime transform) ne l'annule pas. */
+  rotate: -4deg;
+}
+.card .season-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* Marges négatives : zone tactile confortable sans décaler la mise en page. */
+  margin: -6px 0 -10px -8px;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: var(--tag-color);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.card .season-link span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.card .plus1 {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  flex-shrink: 0;
+  border: 1.5px solid var(--tag-color);
+  border-radius: 50%;
+  background: var(--tag-bg);
+  color: var(--tag-color);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.card .plus1:active {
+  background: var(--tag-color);
+  color: var(--surface);
+}
+/* « +1 » qui s'envole au-dessus du bouton (src/ui/animate.ts). */
+.float-label {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tag-color);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.addbar-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  justify-content: center;
+}
+.addbar {
+  width: 100%;
+  max-width: 448px;
+  padding: 16px;
+  border: none;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* Effet d'appui : les boutons se compriment légèrement, comme les boutons natifs iOS. */
+.addbar,
+.btn,
+.plus1,
+.season-link,
+.stepper button,
+.icon-btn {
+  transition:
+    transform 0.12s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.addbar:active,
+.btn:active {
+  transform: scale(0.97);
+}
+.plus1:active,
+.season-link:active,
+.stepper button:active,
+.icon-btn:active {
+  transform: scale(0.9);
+}
+
+/* ---------------------------------------------------------------- Réglages */
+
+.settings-section {
+  margin-bottom: 28px;
+}
+.settings-note {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+/* Copie de secours (données illisibles) : n'apparaît que s'il y en a une. */
+#backupArea {
+  margin-top: 18px;
+}
+
+/* ---------------------------------------------------------------- Bottom sheet */
+
+/* <dialog> modal : focus, touche Échap et fond assombri gérés par le navigateur.
+   Ouverture animée ici ; la fermeture passe par la classe .closing (src/entryForm.ts). */
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100% - env(safe-area-inset-top, 0px) - 16px);
+  margin: auto auto 0;
+  padding: 0;
+  overflow-y: auto;
+  background: var(--paper);
+  color: var(--ink);
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+}
+.sheet::backdrop {
+  background: var(--backdrop);
+}
+.sheet[open] {
+  animation: sheet-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet[open]::backdrop {
+  animation: fade-in 0.32s ease-out;
+}
+.sheet.closing {
+  animation: sheet-out 0.22s ease-in forwards;
+}
+.sheet.closing::backdrop {
+  animation: fade-out 0.22s ease-in forwards;
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.sheet-body {
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+.sheet h2 {
+  font-size: 22px;
+  margin: 0 0 16px;
+}
+
+/* ---------------------------------------------------------------- Formulaires */
+
+.field {
+  margin: 0 0 16px;
+}
+fieldset.field {
+  border: none;
+  padding: 0;
+  min-width: 0;
+}
+.field-label {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+  padding: 0;
+}
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+  border-radius: 12px;
+}
+.entry-row {
+  display: flex;
+  gap: 10px;
+}
+.emoji-field {
+  width: 64px;
+  flex-shrink: 0;
+}
+.emoji-field .input {
+  text-align: center;
+  font-size: 22px;
+  padding: 9px 4px;
+}
+.title-field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Groupe de boutons radio présenté en contrôle segmenté : une pastille (::before) glisse
+   sous l'option cochée. Le nombre d'options est détecté pour dimensionner la pastille. */
+.seg {
+  --n: 2;
+  position: relative;
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.seg:has(> label:nth-child(3)) {
+  --n: 3;
+}
+.seg::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--n));
+  border-radius: 9px;
+  background: var(--pill, var(--ink));
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.28s ease;
+}
+.seg:has(> label:nth-child(2) input:checked)::before {
+  transform: translateX(100%);
+}
+.seg:has(> label:nth-child(3) input:checked)::before {
+  transform: translateX(200%);
+}
+/* Couleur de la pastille : celle du type coché (choix Manga / Anime) ou du groupe. */
+.seg[data-type],
+.seg:has([data-type] input:checked) {
+  --pill: var(--tag-color);
+}
+.seg:has([data-type="manga"] input:checked) {
+  --tag-color: var(--manga);
+}
+.seg:has([data-type="anime"] input:checked) {
+  --tag-color: var(--anime);
+}
+.seg label {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.seg input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.seg span {
+  display: block;
+  padding: 9px 6px;
+  text-align: center;
+  font-size: 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: color 0.28s ease;
+}
+.seg input:checked + span {
+  color: var(--paper);
+  font-weight: 600;
+}
+.seg input:focus-visible + span {
+  outline: 2px solid var(--ink-soft);
+  outline-offset: -2px;
+}
+
+/* Saison et épisode côte à côte quand les deux sont affichés. */
+.progress-row {
+  display: flex;
+  gap: 12px;
+}
+.progress-row .field {
+  flex: 1;
+  min-width: 0;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.stepper button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 20px;
+  cursor: pointer;
+}
+.stepper input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 34px;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.stepper input::-webkit-inner-spin-button,
+.stepper input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.btn.primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+}
+.btn.danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.err {
+  color: var(--danger);
+  font-size: 13px;
+  margin: -8px 0 12px;
+}
+
+/* ---------------------------------------------------------------- Toast */
+
+.toast {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  max-width: 448px;
+  margin: 0 auto;
+  padding: 12px 14px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-size: 14px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(-8px);
+  /* visibility retardée : une fois masqué, le bouton du toast n'est plus atteignable. */
+  visibility: hidden;
+  transition:
+    opacity 0.2s,
+    transform 0.2s,
+    visibility 0s 0.2s;
+}
+.toast.show {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.toast-action {
+  flex-shrink: 0;
+  margin: -8px -6px;
+  padding: 8px 6px;
+  border: none;
+  background: transparent;
+  color: var(--paper);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- Changement de thème */
+
+/* Posée quelques instants par src/settings/theme.ts : les couleurs passent en fondu. */
+.theme-fade,
+.theme-fade *,
+.theme-fade *::before,
+.theme-fade *::after {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease !important;
+}

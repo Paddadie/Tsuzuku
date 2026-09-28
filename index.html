@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tsuzuku</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Tsuzuku" />
+    <meta name="theme-color" content="#1A1611" />
+    <script>
+      // Applique le thème avant le premier affichage pour éviter un flash de la mauvaise couleur.
+      // Même logique que src/settings/theme.ts, même clé que src/storage/settingsRepo.ts.
+      // La barre du navigateur prend la couleur --paper du thème (src/style.css) ; le CSS
+      // n'est pas encore chargé ici, d'où les deux couleurs en dur.
+      try {
+        var pref = (JSON.parse(localStorage.getItem("tsuzuku:settings")) || {}).theme;
+        var light = pref === "light" || (pref !== "dark" && matchMedia("(prefers-color-scheme: light)").matches);
+        document.documentElement.dataset.theme = light ? "light" : "dark";
+        document.querySelector('meta[name="theme-color"]').content = light ? "#efe8d8" : "#1a1611";
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div class="page" id="listPage">
+      <header class="app-header">
+        <div class="header-row">
+          <h1 class="display">Tsuzuku <span class="kanji">続く</span></h1>
+          <button type="button" class="icon-btn header-action" id="openSettings" aria-label="Réglages">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+              />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+        <p id="count" class="header-sub">—</p>
+      </header>
+
+      <main id="list" class="page-body"></main>
+
+      <div class="addbar-wrap">
+        <button type="button" class="addbar" id="openAdd">+ Ajouter une série</button>
+      </div>
+    </div>
+
+    <div class="page page-overlay" id="settingsPage" hidden>
+      <header class="app-header">
+        <div class="header-row">
+          <button type="button" class="icon-btn back-btn" id="closeSettings" aria-label="Retour à la liste">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <h1 class="display">Réglages</h1>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <form id="settingsForm">
+          <section class="settings-section">
+            <h2 class="section-title">Apparence</h2>
+            <fieldset class="field">
+              <legend class="field-label">Thème</legend>
+              <div class="seg">
+                <label><input type="radio" name="theme" value="system" /><span>Système</span></label>
+                <label><input type="radio" name="theme" value="light" /><span>Clair</span></label>
+                <label><input type="radio" name="theme" value="dark" /><span>Sombre</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="field">
+              <legend class="field-label">Tri dans chaque catégorie</legend>
+              <div class="seg">
+                <label><input type="radio" name="sort" value="alpha" /><span>Alphabétique</span></label>
+                <label><input type="radio" name="sort" value="recent" /><span>Récents</span></label>
+              </div>
+            </fieldset>
+          </section>
+        </form>
+
+        <section class="settings-section">
+          <h2 class="section-title">Données</h2>
+          <p class="settings-note" id="dataSummary"></p>
+          <p class="settings-note">
+            Tes séries sont enregistrées uniquement dans ce navigateur. Sur iPhone, Safari et l’app ajoutée à l’écran
+            d’accueil ne partagent pas leurs données : exporte régulièrement une sauvegarde, et utilise l’import pour
+            passer de l’un à l’autre ou changer d’appareil.
+          </p>
+          <button type="button" class="btn ghost" id="exportBtn">Exporter une sauvegarde</button>
+          <button type="button" class="btn ghost" id="importBtn">Importer une sauvegarde</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+          <div id="backupArea" hidden>
+            <p class="settings-note" id="backupSummary"></p>
+            <button type="button" class="btn ghost" id="exportBackupBtn">Exporter la copie de secours</button>
+            <button type="button" class="btn danger" id="deleteBackupBtn">Supprimer la copie de secours</button>
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <h2 class="section-title">À propos</h2>
+          <p class="settings-note" id="appVersion"></p>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="entryDialog" class="sheet" aria-labelledby="entryDialogTitle">
+      <form id="entryForm" class="sheet-body" novalidate>
+        <h2 id="entryDialogTitle" class="display" tabindex="-1">Nouvelle série</h2>
+
+        <div class="entry-row">
+          <div class="field emoji-field">
+            <label class="field-label" for="emojiInput">Emoji</label>
+            <input type="text" id="emojiInput" class="input" autocomplete="off" enterkeyhint="next" />
+          </div>
+          <div class="field title-field">
+            <label class="field-label" for="titleInput">Titre</label>
+            <input
+              type="text"
+              id="titleInput"
+              class="input"
+              placeholder="Ex. Jujutsu Kaisen"
+              autocomplete="off"
+              enterkeyhint="done"
+            />
+          </div>
+        </div>
+        <p class="err" id="formErr" role="alert" hidden></p>
+
+        <fieldset class="field">
+          <legend class="field-label">Type</legend>
+          <div class="seg">
+            <label data-type="manga"><input type="radio" name="type" value="manga" /><span>Manga</span></label>
+            <label data-type="anime"><input type="radio" name="type" value="anime" /><span>Anime</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="field" id="trackingField">
+          <legend class="field-label">Suivi</legend>
+          <div class="seg" data-type="anime">
+            <label><input type="radio" name="tracking" value="episodes" /><span>Épisodes</span></label>
+            <label><input type="radio" name="tracking" value="seasons" /><span>Saisons + épisodes</span></label>
+          </div>
+        </fieldset>
+
+        <div class="progress-row">
+          <div class="field" id="seasonField">
+            <label class="field-label" for="seasonInput">Saison actuelle</label>
+            <div class="stepper">
+              <button type="button" data-step="-1" aria-label="Saison précédente">−</button>
+              <input type="number" id="seasonInput" class="display" inputmode="numeric" min="1" step="1" />
+              <button type="button" data-step="1" aria-label="Saison suivante">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="progressInput" id="progressLabel">Chapitre actuel</label>
+            <div class="stepper">
+              <button type="button" data-step="-1" aria-label="Retirer 1">−</button>
+              <input type="number" id="progressInput" class="display" inputmode="numeric" min="1" step="1" />
+              <button type="button" data-step="1" aria-label="Ajouter 1">+</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn primary" type="submit" id="entrySave">Ajouter</button>
+        <button class="btn ghost" type="button" id="entryCancel">Annuler</button>
+
+        <button class="btn danger" id="editDelete" type="button">Supprimer la série</button>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
