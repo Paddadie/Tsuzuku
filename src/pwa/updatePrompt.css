@@ -2,8 +2,7 @@
   position: fixed;
   left: 16px;
   right: 16px;
-  /* Juste au-dessus de la barre « Ajouter une série » (.addbar-wrap dans style.css). */
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   max-width: 448px;
   margin: 0 auto;
   background: var(--surface);

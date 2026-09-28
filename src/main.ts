@@ -17,8 +17,6 @@ const loaded = readEntries();
 let entries: Entry[] = loaded.entries;
 let settings: Settings = readSettings();
 
-const MARQUEE_GAP_PX = 48;
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const collator = new Intl.Collator("fr", { sensitivity: "base", numeric: true });
 
 const COMPARATORS: Record<SortOrder, (a: Entry, b: Entry) => number> = {
@@ -67,7 +65,7 @@ function render(highlight?: Highlight): void {
   const list = $("list");
   if (n === 0) {
     list.innerHTML =
-      '<div class="empty"><p>Aucune série suivie.<br>Ajoute ta première avec le bouton ci-dessous.</p></div>';
+      '<div class="empty"><p>Aucune série suivie.<br>Ajoute ta première avec le bouton + en haut.</p></div>';
     return;
   }
 
@@ -92,7 +90,6 @@ function render(highlight?: Highlight): void {
     const card = list.querySelector(`.card[data-id="${CSS.escape(highlight.id)}"]`);
     card?.classList.add(highlight.isNew ? "card-new" : "card-flash");
   }
-  requestAnimationFrame(setupMarquee);
 }
 
 // Toute la carte ouvre la fiche de modification (bouton .card-main étendu sur la carte) ;
@@ -119,39 +116,16 @@ function cardHtml(e: Entry): string {
     <button type="button" class="card-main" data-action="edit" aria-label="Modifier ${title}"></button>
     <span class="icon" aria-hidden="true">${escapeHtml(displayEmoji(e))}</span>
     <span class="body">
-      <span class="title-wrap"><span class="title-text">${title}</span></span>
+      <span class="title">${title}</span>
       ${progress}
     </span>
     <button type="button" class="plus1" data-action="plus" aria-label="+1 ${info.unit} pour ${title}">+1</button>
   </div>`;
 }
 
-// Fait défiler les titres trop longs pour leur carte. Le texte est dupliqué dans un
-// span aria-hidden pour que la boucle soit continue sans être lue deux fois.
-// Les titres déjà en défilement sont ignorés : on peut rappeler la fonction après avoir
-// redessiné une seule carte.
-function setupMarquee(): void {
-  if (reducedMotion.matches) return;
-  $("list")
-    .querySelectorAll<HTMLElement>(".title-text:not(.marquee)")
-    .forEach((span) => {
-      const wrap = span.parentElement;
-      if (!wrap || span.scrollWidth <= wrap.clientWidth + 2) return;
-      const dist = span.scrollWidth + MARQUEE_GAP_PX;
-      const copy = document.createElement("span");
-      copy.setAttribute("aria-hidden", "true");
-      copy.style.paddingLeft = `${MARQUEE_GAP_PX}px`;
-      copy.textContent = span.textContent;
-      span.append(copy);
-      span.style.setProperty("--mq-dist", `${dist}px`);
-      span.style.animationDuration = `${Math.max(4, dist / 45)}s`;
-      span.classList.add("marquee");
-    });
-}
-
 // Les actions rapides mettent à jour la carte en place plutôt que de redessiner la liste :
-// la carte ne change pas de place sous le doigt (tri « Récents ») et les titres défilants
-// ne redémarrent pas. Le nouvel ordre s'appliquera au prochain affichage de la liste.
+// la carte ne change pas de place sous le doigt (tri « Récents »). Le nouvel ordre
+// s'appliquera au prochain affichage de la liste.
 
 function incrementProgress(card: HTMLElement, plusBtn: HTMLElement, entry: Entry): void {
   entry.progress += 1;
@@ -202,7 +176,6 @@ function redrawCard(entry: Entry): void {
   card.outerHTML = cardHtml(entry);
   const fresh = $("list").querySelector(`.card[data-id="${CSS.escape(entry.id)}"]`);
   fresh?.querySelectorAll<HTMLElement>(".season-badge, .num").forEach(bump);
-  requestAnimationFrame(setupMarquee);
 }
 
 // ---------------------------------------------------------------- Ajout / modification
@@ -222,22 +195,12 @@ function saveEntry(draft: EntryDraft, editingId: string | null): void {
   }
 }
 
-// Suppression immédiate, annulable quelques secondes depuis le toast (comme la saison suivante).
+// Appelée une fois la suppression confirmée dans la fiche.
 async function deleteEntry(id: string): Promise<void> {
-  const entry = findEntry(id);
-  if (!entry) return;
   const card = $("list").querySelector<HTMLElement>(`.card[data-id="${CSS.escape(id)}"]`);
   if (card) await collapse(card);
-  entries = entries.filter((e) => e !== entry);
-  if (!commit()) return; // garde le message d'erreur à l'écran plutôt que le toast « Annuler »
-  toast(`Série « ${entry.title} » supprimée.`, {
-    label: "Annuler",
-    onClick: () => {
-      if (findEntry(id)) return;
-      entries.push(entry);
-      commit({ id, isNew: true });
-    },
-  });
+  entries = entries.filter((e) => e.id !== id);
+  commit();
 }
 
 // ---------------------------------------------------------------- Pages et réglages
@@ -299,14 +262,6 @@ $("closeSettings").addEventListener("click", () => void showPage("list"));
 
 // Sans écouteur touchstart, Safari iOS n'applique pas les styles :active (effet d'appui).
 document.addEventListener("touchstart", () => {}, { passive: true });
-
-// Recalcule les titres défilants quand la largeur change (rotation de l'écran).
-let lastWidth = window.innerWidth;
-window.addEventListener("resize", () => {
-  if (window.innerWidth === lastWidth) return;
-  lastWidth = window.innerWidth;
-  render();
-});
 
 applyTheme(settings.theme);
 followSystemTheme(() => settings.theme);

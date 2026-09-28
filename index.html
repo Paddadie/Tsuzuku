@@ -26,7 +26,21 @@
       <header class="app-header">
         <div class="header-row">
           <h1 class="display">Tsuzuku <span class="kanji">続く</span></h1>
-          <button type="button" class="icon-btn header-action" id="openSettings" aria-label="Réglages">
+          <button type="button" class="icon-btn header-action" id="openAdd" aria-label="Ajouter une série">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <path d="M12 8v8M8 12h8" />
+            </svg>
+          </button>
+          <button type="button" class="icon-btn" id="openSettings" aria-label="Réglages">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -47,10 +61,6 @@
       </header>
 
       <main id="list" class="page-body"></main>
-
-      <div class="addbar-wrap">
-        <button type="button" class="addbar" id="openAdd">+ Ajouter une série</button>
-      </div>
     </div>
 
     <div class="page page-overlay" id="settingsPage" hidden>
@@ -182,6 +192,17 @@
         <button class="btn ghost" type="button" id="entryCancel">Annuler</button>
 
         <button class="btn danger" id="editDelete" type="button">Supprimer la série</button>
+      </form>
+    </dialog>
+
+    <dialog id="confirmDialog" class="alert" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <form method="dialog" class="alert-body">
+        <h2 id="confirmTitle" class="display alert-title"></h2>
+        <p id="confirmMessage" class="alert-message"></p>
+        <div class="confirm-row">
+          <button class="btn ghost" value="cancel" autofocus>Annuler</button>
+          <button class="btn danger" value="confirm" id="confirmOk"></button>
+        </div>
       </form>
     </dialog>
 

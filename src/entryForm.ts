@@ -3,6 +3,7 @@ import { SERIES_TYPES, isSeriesType } from "./types";
 import { isSingleEmoji } from "./emoji";
 import { $, radioValue, setRadioValue } from "./ui/dom";
 import { playCssAnimation } from "./ui/animate";
+import { confirmDialog } from "./ui/confirm";
 import { capitalize } from "./ui/format";
 
 /** Champs saisis dans le formulaire, communs à l'ajout et à la modification. */
@@ -31,6 +32,7 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
   const progressInput = $<HTMLInputElement>("progressInput");
   const errorEl = $("formErr");
   let editingId: string | null = null;
+  let editingTitle = ""; // titre enregistré, pour la confirmation de suppression
 
   const selectedType = (): SeriesType => {
     const value = radioValue(form, "type");
@@ -73,6 +75,7 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
   function open(entry?: Entry): void {
     const isEdit = entry !== undefined;
     editingId = entry?.id ?? null;
+    editingTitle = entry?.title ?? "";
 
     heading.textContent = isEdit ? "Modifier la série" : "Nouvelle série";
     $("entrySave").textContent = isEdit ? "Enregistrer" : "Ajouter";
@@ -130,9 +133,15 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
   });
 
   $("entryCancel").addEventListener("click", () => void closeSheet());
-  // Pas de confirmation : la suppression s'annule depuis le toast qui suit (voir main.ts).
+  // Suppression confirmée dans une pop-up, par-dessus la sheet.
   $("editDelete").addEventListener("click", async () => {
     const id = editingId;
+    const confirmed = await confirmDialog({
+      title: "Supprimer cette série ?",
+      message: `« ${editingTitle} » et sa progression seront définitivement supprimées.`,
+      confirmLabel: "Supprimer",
+    });
+    if (!confirmed) return;
     await closeSheet(); // la carte se replie une fois la sheet refermée
     if (id) deps.onDelete(id);
   });

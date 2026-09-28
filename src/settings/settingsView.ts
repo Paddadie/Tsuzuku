@@ -10,7 +10,8 @@ import {
 import { isSortOrder, isThemePreference } from "../storage/settingsRepo";
 import { parseJson } from "../storage/localStore";
 import { $, radioValue, setRadioValue } from "../ui/dom";
-import { plural } from "../ui/format";
+import { confirmDialog } from "../ui/confirm";
+import { capitalize, plural } from "../ui/format";
 import { toast } from "../ui/toast";
 
 export interface SettingsViewDeps {
@@ -48,9 +49,14 @@ export function initSettingsView(initial: Settings, deps: SettingsViewDeps): Set
   });
 
   $("exportBackupBtn").addEventListener("click", () => void saveFiles(readBackups().map(backupFile)));
-  $("deleteBackupBtn").addEventListener("click", () => {
+  $("deleteBackupBtn").addEventListener("click", async () => {
     const n = readBackups().length;
-    if (!window.confirm(`Supprimer définitivement ${n === 1 ? "la copie" : `les ${n} copies`} de secours ?`)) return;
+    const confirmed = await confirmDialog({
+      title: n === 1 ? "Supprimer la copie de secours ?" : `Supprimer les ${n} copies de secours ?`,
+      message: "Pense à l’exporter avant si tu veux la conserver : la suppression est définitive.",
+      confirmLabel: "Supprimer",
+    });
+    if (!confirmed) return;
     deleteBackups();
     refresh();
     toast(n === 1 ? "Copie de secours supprimée." : "Copies de secours supprimées.");
@@ -134,11 +140,19 @@ async function importEntries(file: File, deps: SettingsViewDeps): Promise<void> 
       toast("Ce fichier ne contient aucune série.");
       return;
     }
-    if (!window.confirm(`Ce fichier ne contient aucune série : l’importer effacera ${currentLabel}. Continuer ?`))
-      return;
+    const confirmed = await confirmDialog({
+      title: "Vider ta liste ?",
+      message: `Ce fichier ne contient aucune série : l’importer effacera ${currentLabel}.`,
+      confirmLabel: "Vider la liste",
+    });
+    if (!confirmed) return;
   } else if (current > 0) {
-    const question = `Remplacer ${currentLabel} par ${imported.length === 1 ? "celle" : `les ${imported.length}`} du fichier ?`;
-    if (!window.confirm(question)) return;
+    const confirmed = await confirmDialog({
+      title: "Remplacer ta liste ?",
+      message: `${capitalize(currentLabel)} ${current === 1 ? "sera remplacée" : "seront remplacées"} par ${imported.length === 1 ? "la série" : `les ${imported.length} séries`} du fichier.`,
+      confirmLabel: "Remplacer",
+    });
+    if (!confirmed) return;
   }
 
   if (!deps.replaceEntries(imported)) return;

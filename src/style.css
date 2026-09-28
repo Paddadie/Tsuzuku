@@ -20,6 +20,7 @@
   --dots: rgba(255, 255, 255, 0.06);
   --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   --backdrop: rgba(0, 0, 0, 0.55);
+  --soft-fill: rgba(237, 230, 216, 0.09);
 }
 :root[data-theme="light"] {
   color-scheme: light;
@@ -39,6 +40,7 @@
   --dots: rgba(31, 27, 22, 0.11);
   --shadow: 0 1px 2px rgba(80, 55, 25, 0.06), 0 8px 22px rgba(80, 55, 25, 0.1);
   --backdrop: rgba(31, 27, 22, 0.45);
+  --soft-fill: rgba(31, 27, 22, 0.07);
 }
 
 /* Couleurs d'accent par type de série : cartes, titres de section, choix du type. */
@@ -199,10 +201,6 @@ button {
   width: 100%;
   margin: 0 auto;
 }
-/* Place pour la barre d'ajout fixée en bas. */
-#list {
-  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
-}
 
 .section-title {
   display: flex;
@@ -344,27 +342,19 @@ button {
   flex-direction: column;
   gap: 6px;
 }
-.title-wrap {
-  display: block;
+/* Titre sur deux lignes au plus, coupé par « … » au-delà. Un titre long sur deux lignes
+   tient dans la hauteur minimale de la carte, sauf sur un anime suivi par saison (carte
+   alors un peu plus haute). */
+.card .title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.title-text {
-  display: inline-block;
+  overflow-wrap: break-word;
   font-size: 19px;
   font-weight: 600;
-}
-.title-text.marquee {
-  animation: marquee-scroll linear infinite;
-}
-@keyframes marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-1 * var(--mq-dist, 100px)));
-  }
+  line-height: 1.2;
 }
 /* Progression sous le titre, pour laisser toute la largeur au titre. */
 .card .progress {
@@ -449,31 +439,7 @@ button {
   pointer-events: none;
 }
 
-.addbar-wrap {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 0 16px calc(16px + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  justify-content: center;
-}
-.addbar {
-  width: 100%;
-  max-width: 448px;
-  padding: 16px;
-  border: none;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-}
-
 /* Effet d'appui : les boutons se compriment légèrement, comme les boutons natifs iOS. */
-.addbar,
 .btn,
 .plus1,
 .season-link,
@@ -484,7 +450,6 @@ button {
     background-color 0.15s ease,
     color 0.15s ease;
 }
-.addbar:active,
 .btn:active {
   transform: scale(0.97);
 }
@@ -747,14 +712,66 @@ fieldset.field {
   color: var(--on-primary);
   border-color: var(--primary);
 }
+/* Bouton secondaire (Annuler, Exporter…) : fond teinté sans bordure, pour se détacher du
+   fond de la page sans ressembler à un champ ni concurrencer le bouton principal. */
 .btn.ghost {
-  background: transparent;
+  background: var(--soft-fill);
+  border-color: transparent;
   color: var(--ink);
 }
 .btn.danger {
   background: transparent;
   color: var(--danger);
   border-color: var(--danger);
+}
+
+/* Pop-up de confirmation (src/ui/confirm.ts) : centrée, par-dessus la sheet. */
+.alert {
+  width: calc(100% - 48px);
+  max-width: 340px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.alert::backdrop {
+  background: var(--backdrop);
+}
+.alert[open] {
+  animation: alert-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.alert[open]::backdrop {
+  animation: fade-in 0.22s ease-out;
+}
+@keyframes alert-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.alert-body {
+  padding: 22px 18px 18px;
+  text-align: center;
+}
+.alert-title {
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+.alert-message {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0 0 20px;
+  overflow-wrap: break-word;
+}
+.confirm-row {
+  display: flex;
+  gap: 10px;
+}
+.confirm-row .btn {
+  margin-bottom: 0;
 }
 
 .err {
