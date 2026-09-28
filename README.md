@@ -17,7 +17,7 @@ src/storage/entriesRepo.ts     lecture/écriture/validation de la liste, format 
 src/storage/settingsRepo.ts    réglages (thème, tri)
 src/settings/settingsView.ts   page Réglages : thème, tri, export/import, version
 src/settings/theme.ts          application du thème (clair / sombre / système)
-src/ui/                        petits utilitaires : DOM, animations, toast, pop-up de confirmation, textes
+src/ui/                        petits utilitaires : DOM, animations, toast, pop-up de confirmation, textes, hauteur d'écran iOS
 src/env.d.ts                   version de l'app injectée au build
 src/pwa/updatePrompt.ts(.css)  bandeau « Nouvelle version disponible »
 public/icon.svg                icône : chapeau de paille (tracé noir, fond transparent)

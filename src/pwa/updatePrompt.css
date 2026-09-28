@@ -2,7 +2,8 @@
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  /* --viewport-gap : voir src/ui/viewport.ts. */
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px) - var(--viewport-gap, 0px));
   max-width: 448px;
   margin: 0 auto;
   background: var(--surface);

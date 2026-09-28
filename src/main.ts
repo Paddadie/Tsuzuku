@@ -11,6 +11,7 @@ import { $, escapeHtml } from "./ui/dom";
 import { bump, collapse, floatLabel, playCssAnimation } from "./ui/animate";
 import { capitalize, plural } from "./ui/format";
 import { toast } from "./ui/toast";
+import { fitIosStandaloneViewport } from "./ui/viewport";
 import { initUpdatePrompt } from "./pwa/updatePrompt";
 
 const loaded = readEntries();
@@ -263,6 +264,7 @@ $("closeSettings").addEventListener("click", () => void showPage("list"));
 // Sans écouteur touchstart, Safari iOS n'applique pas les styles :active (effet d'appui).
 document.addEventListener("touchstart", () => {}, { passive: true });
 
+fitIosStandaloneViewport();
 applyTheme(settings.theme);
 followSystemTheme(() => settings.theme);
 render();
