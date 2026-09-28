@@ -62,6 +62,12 @@
 html {
   height: 100%;
   overflow: hidden;
+  background: var(--paper);
+}
+/* La page elle-même ne rebondit jamais : seule la liste défile, et seulement si elle déborde. */
+html,
+body {
+  overscroll-behavior: none;
 }
 body {
   margin: 0;
@@ -196,7 +202,9 @@ button {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+  /* En bas, juste de quoi dégager la barre d'accueil de l'iPhone : un espace plus grand
+     suffirait à rendre la liste défilable alors que toutes les cartes tiennent à l'écran. */
+  padding: 20px 16px calc(12px + env(safe-area-inset-bottom, 0px));
   max-width: 480px;
   width: 100%;
   margin: 0 auto;
@@ -279,6 +287,11 @@ button {
   border-radius: 20px;
   box-shadow: var(--shadow);
   transition: transform 0.15s ease;
+}
+/* Pas de marge sous la dernière carte d'un groupe : l'écart entre groupes est géré par
+   .group + .group, et en bas de liste elle créerait un débordement inutile. */
+.card:last-child {
+  margin-bottom: 0;
 }
 .card:has(.card-main:active) {
   transform: scale(0.98);
