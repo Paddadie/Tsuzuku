@@ -11,6 +11,7 @@ import { $, escapeHtml } from "./ui/dom";
 import { bump, collapse, floatLabel, playCssAnimation } from "./ui/animate";
 import { capitalize, plural } from "./ui/format";
 import { toast } from "./ui/toast";
+import { confirmDialog } from "./ui/confirm";
 import { fitIosStandaloneViewport } from "./ui/viewport";
 import { initUpdatePrompt } from "./pwa/updatePrompt";
 
@@ -140,34 +141,23 @@ function incrementProgress(card: HTMLElement, plusBtn: HTMLElement, entry: Entry
   floatLabel(plusBtn, "+1");
 }
 
-// Passer à la saison suivante = saison + 1 et retour à l'épisode 1, en un seul geste,
-// avec la possibilité d'annuler quelques secondes.
-function nextSeason(entry: Entry): void {
+// Passer à la saison suivante = saison + 1 et retour à l'épisode 1, après confirmation.
+async function nextSeason(entry: Entry): Promise<void> {
   if (entry.season === null) return; // le lien n'existe que sur les animes suivis par saison
-  const before = { season: entry.season, progress: entry.progress, updatedAt: entry.updatedAt };
-  entry.season += 1;
+  const next = entry.season + 1;
+  const confirmed = await confirmDialog({
+    title: `Passer à la saison ${next} ?`,
+    message: `« ${entry.title} » repartira à l’épisode 1 de la saison ${next}.`,
+    confirmLabel: "Passer",
+    tone: "primary",
+  });
+  // La série a pu être supprimée ou modifiée pendant que la pop-up était ouverte.
+  if (!confirmed || findEntry(entry.id) !== entry || entry.season !== next - 1) return;
+  entry.season = next;
   entry.progress = 1;
   entry.updatedAt = Date.now();
-  const after = { season: entry.season, progress: entry.progress };
-  const saved = persist();
+  persist();
   redrawCard(entry);
-  if (!saved) return; // garde le message d'erreur à l'écran plutôt que le toast « Annuler »
-  toast(`${entry.title} : saison ${entry.season}, épisode 1`, {
-    label: "Annuler",
-    onClick: () => {
-      // Si la série a bougé entre-temps (+1, correction dans la fiche, suppression),
-      // revenir en arrière effacerait ce changement : on préfère ne rien faire.
-      const unchanged =
-        findEntry(entry.id) === entry && entry.season === after.season && entry.progress === after.progress;
-      if (!unchanged) {
-        toast("La série a été modifiée entre-temps : rien n’a été annulé.");
-        return;
-      }
-      Object.assign(entry, before);
-      persist();
-      redrawCard(entry);
-    },
-  });
 }
 
 /** Redessine une seule carte et fait rebondir sa progression. */
@@ -254,7 +244,7 @@ $("list").addEventListener("click", (ev) => {
   if (!actionEl || !card || !entry) return;
   const action = actionEl.dataset.action;
   if (action === "plus") incrementProgress(card, actionEl, entry);
-  else if (action === "next-season") nextSeason(entry);
+  else if (action === "next-season") void nextSeason(entry);
   else entryForm.open(entry);
 });
 $("openAdd").addEventListener("click", () => entryForm.open());

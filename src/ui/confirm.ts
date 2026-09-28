@@ -5,6 +5,8 @@ export interface ConfirmOptions {
   message: string;
   /** Libellé du bouton qui valide (ex. « Supprimer »). */
   confirmLabel: string;
+  /** Style du bouton qui valide : rouge pour une action destructrice (par défaut), sinon principal. */
+  tone?: "danger" | "primary";
 }
 
 /**
@@ -13,11 +15,13 @@ export interface ConfirmOptions {
  * iPhone et ignore le thème). Résout true si l'action est confirmée ; Annuler, Échap ou
  * un toucher sur le fond résolvent false.
  */
-export function confirmDialog({ title, message, confirmLabel }: ConfirmOptions): Promise<boolean> {
+export function confirmDialog({ title, message, confirmLabel, tone = "danger" }: ConfirmOptions): Promise<boolean> {
   const dialog = $<HTMLDialogElement>("confirmDialog");
+  const ok = $("confirmOk");
   $("confirmTitle").textContent = title;
   $("confirmMessage").textContent = message;
-  $("confirmOk").textContent = confirmLabel;
+  ok.textContent = confirmLabel;
+  ok.className = `btn ${tone}`;
   dialog.returnValue = "";
 
   const onBackdropClick = (ev: MouseEvent): void => {

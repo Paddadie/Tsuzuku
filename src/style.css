@@ -66,6 +66,9 @@ html {
   height: calc(100% + var(--viewport-gap, 0px));
   overflow: hidden;
   background: var(--paper);
+  /* Pas de zoom au double toucher (iOS) : on peut enchaîner les +1 rapidement. Le zoom à
+     deux doigts reste possible. */
+  touch-action: manipulation;
 }
 /* La page elle-même ne rebondit jamais : seule la liste défile, et seulement si elle déborde. */
 html,
@@ -812,13 +815,9 @@ fieldset.field {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   font-size: 14px;
   z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   opacity: 0;
   transform: translateY(-8px);
-  /* visibility retardée : une fois masqué, le bouton du toast n'est plus atteignable. */
+  /* visibility retardée : une fois masqué, le toast n'est plus lu par les lecteurs d'écran. */
   visibility: hidden;
   transition:
     opacity 0.2s,
@@ -830,18 +829,6 @@ fieldset.field {
   transform: none;
   visibility: visible;
   transition-delay: 0s;
-}
-.toast-action {
-  flex-shrink: 0;
-  margin: -8px -6px;
-  padding: 8px 6px;
-  border: none;
-  background: transparent;
-  color: var(--paper);
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
 }
 
 /* ---------------------------------------------------------------- Changement de thème */
