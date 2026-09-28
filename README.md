@@ -1,6 +1,6 @@
 # Tsuzuku (続く)
 
-Suivi de mangas et animes en cours. Liste, ajout, modification et suppression, 100% local (`localStorage`) : aucune donnée n'est envoyée nulle part, et l'app fonctionne hors ligne une fois installée.
+Suivi de mangas, animes et séries en cours. Liste, ajout, modification et suppression, 100% local (`localStorage`) : aucune donnée n'est envoyée nulle part, et l'app fonctionne hors ligne une fois installée.
 
 ## Structure
 
@@ -8,10 +8,10 @@ Suivi de mangas et animes en cours. Liste, ajout, modification et suppression, 1
 index.html                     page unique : liste, réglages, sheet d'ajout/modification
 pwa-assets.config.ts           génération des icônes PNG à partir de public/icon.svg
 src/main.ts                    état, rendu de la liste, câblage et démarrage
-src/entryForm.ts               sheet d'ajout / modification d'une série (<dialog>)
-src/types.ts                   types partagés + infos par type de série (libellés, emoji par défaut)
+src/entryForm.ts               sheet d'ajout / modification d'une œuvre (<dialog>)
+src/types.ts                   types partagés + infos par type d'œuvre (libellés, emoji par défaut, saisons)
 src/emoji.ts                   validation « un seul emoji »
-src/style.css                  style (thème sombre + variante claire)
+src/style.css                  style (thèmes clair et sombre)
 src/storage/localStore.ts      accès bas niveau à localStorage (erreurs absorbées)
 src/storage/entriesRepo.ts     lecture/écriture/validation de la liste, format d'export
 src/storage/settingsRepo.ts    réglages (thème, tri)
@@ -57,13 +57,13 @@ Une fois l'URL GitHub Pages ouverte dans **Safari** :
 1. Icône de partage → **« Sur l'écran d'accueil »**
 2. L'app s'ouvre ensuite en plein écran, sans barre Safari
 
-⚠️ Safari et l'app installée sur l'écran d'accueil ont **des stockages séparés** : les séries saisies dans l'un n'apparaissent pas dans l'autre. Utilise **Réglages → Exporter / Importer une sauvegarde** pour passer de l'un à l'autre ou changer d'appareil.
+⚠️ Safari et l'app installée sur l'écran d'accueil ont **des stockages séparés** : les œuvres saisies dans l'un n'apparaissent pas dans l'autre. Utilise **Réglages → Exporter / Importer une sauvegarde** pour passer de l'un à l'autre ou changer d'appareil.
 
 ## Notes
 
 - Thème : **Système** par défaut (suit le mode clair/sombre de l'appareil), forçable en clair ou sombre dans les Réglages.
-- Liste groupée par type (mangas puis animes), triée par ordre alphabétique ou par dernière progression (réglage).
-- Un anime peut se suivre en épisodes seuls ou en saison + épisode (choix « Suivi » dans le formulaire).
+- Liste groupée par type (mangas, animes, puis séries), triée par ordre alphabétique ou par dernière progression (réglage).
+- Un anime peut se suivre en épisodes seuls ou en saison + épisode (choix « Suivi » dans le formulaire). Une série se suit toujours en saison + épisode.
 - Les petites animations d'interface sont jouées même si l'appareil demande de réduire les animations.
 - Les titres trop longs passent sur deux lignes, puis sont coupés par « … ».
 - Les données vivent uniquement dans le navigateur qui ouvre la page : pas de synchronisation entre appareils, d'où l'export/import.

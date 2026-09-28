@@ -1,6 +1,7 @@
-/* Thème sombre par défaut. Le thème effectif est posé en data-theme sur <html> par le
-   script inline d'index.html puis par src/settings/theme.ts (le choix « Système » y est
-   résolu) : le CSS n'a donc qu'une seule variante claire à déclarer.
+/* Couleurs du thème sombre sur :root, redéfinies pour le thème clair juste en dessous.
+   Le thème affiché suit le système par défaut (réglage « Système ») : il est résolu en JS
+   et posé en data-theme sur <html> par le script inline d'index.html, avant le premier
+   affichage, puis par src/settings/theme.ts. Le CSS n'a donc que deux variantes à déclarer.
    Direction visuelle : papier imprimé de manga (trame de points, vermillon, tampon hanko). */
 :root {
   color-scheme: dark;
@@ -14,6 +15,8 @@
   --manga-bg: rgba(239, 107, 85, 0.18);
   --anime: #5ec4dc;
   --anime-bg: rgba(94, 196, 220, 0.18);
+  --tv: #e2b04a;
+  --tv-bg: rgba(226, 176, 74, 0.18);
   --primary: #ede6d8;
   --on-primary: #1a1611;
   --danger: #ef6b55;
@@ -34,6 +37,8 @@
   --manga-bg: rgba(210, 67, 47, 0.12);
   --anime: #16789a;
   --anime-bg: rgba(22, 120, 154, 0.12);
+  --tv: #9a6a08;
+  --tv-bg: rgba(154, 106, 8, 0.12);
   --primary: #d2432f;
   --on-primary: #ffffff;
   --danger: #c2382a;
@@ -51,6 +56,10 @@
 [data-type="anime"] {
   --tag-color: var(--anime);
   --tag-bg: var(--anime-bg);
+}
+[data-type="tv"] {
+  --tag-color: var(--tv);
+  --tag-bg: var(--tv-bg);
 }
 
 * {
@@ -642,6 +651,9 @@ fieldset.field {
 }
 .seg:has([data-type="anime"] input:checked) {
   --tag-color: var(--anime);
+}
+.seg:has([data-type="tv"] input:checked) {
+  --tag-color: var(--tv);
 }
 .seg label {
   flex: 1;

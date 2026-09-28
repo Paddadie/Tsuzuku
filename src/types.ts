@@ -1,12 +1,12 @@
-export type SeriesType = "manga" | "anime";
+export type SeriesType = "manga" | "anime" | "tv";
 
 export interface Entry {
   id: string;
   title: string;
   type: SeriesType;
-  /** Chapitre (manga) ou épisode (anime) en cours. */
+  /** Chapitre (manga) ou épisode (anime, série) en cours. */
   progress: number;
-  /** Saison en cours pour un anime suivi par saison, null s'il est suivi en épisodes seuls. */
+  /** Saison en cours, null pour un suivi sans saison (manga, anime en épisodes seuls). */
   season: number | null;
   /** Emoji choisi, ou chaîne vide pour utiliser l'emoji par défaut du type. */
   emoji: string;
@@ -17,18 +17,26 @@ export interface Entry {
   updatedAt: number;
 }
 
+/**
+ * Suivi par saison : jamais, au choix dans la fiche (champ « Suivi » : épisodes seuls ou
+ * saison + épisode), ou toujours.
+ */
+export type SeasonTracking = "never" | "optional" | "always";
+
 interface SeriesTypeInfo {
   plural: string;
   unit: string;
   defaultEmoji: string;
+  seasons: SeasonTracking;
 }
 
-// Libellés et emoji par défaut de chaque type. Ajouter un type = ajouter une entrée ici, ses
-// couleurs dans style.css et son bouton radio dans index.html. Le suivi par saison, lui, est
-// réservé aux animes en dur (entryForm.ts, entriesRepo.ts, champ « Suivi » d'index.html).
+// Tout ce qui varie selon le type de série. Ajouter un type = ajouter une entrée ici, ses
+// couleurs dans style.css et son bouton radio dans index.html. L'ordre des entrées est celui
+// des sections de la liste.
 export const SERIES_TYPES: Record<SeriesType, SeriesTypeInfo> = {
-  manga: { plural: "Mangas", unit: "chapitre", defaultEmoji: "📖" },
-  anime: { plural: "Animes", unit: "épisode", defaultEmoji: "📺" },
+  manga: { plural: "Mangas", unit: "chapitre", defaultEmoji: "📖", seasons: "never" },
+  anime: { plural: "Animes", unit: "épisode", defaultEmoji: "📺", seasons: "optional" },
+  tv: { plural: "Séries", unit: "épisode", defaultEmoji: "🎬", seasons: "always" },
 };
 
 export const SERIES_TYPE_ORDER = Object.keys(SERIES_TYPES) as SeriesType[];

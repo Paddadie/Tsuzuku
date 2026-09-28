@@ -39,15 +39,18 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
     return isSeriesType(value) ? value : "manga";
   };
 
-  // Le suivi par saison n'existe que pour les animes.
-  const tracksSeasons = (): boolean => selectedType() === "anime" && radioValue(form, "tracking") === "seasons";
+  // Saison obligatoire (séries), facultative (animes : choix « Suivi ») ou absente (mangas).
+  const tracksSeasons = (): boolean => {
+    const seasons = SERIES_TYPES[selectedType()].seasons;
+    return seasons === "always" || (seasons === "optional" && radioValue(form, "tracking") === "seasons");
+  };
 
   // Affiche les champs et libellés qui correspondent au type et au mode de suivi choisis.
   const syncFormMode = (): void => {
     const info = SERIES_TYPES[selectedType()];
     $("progressLabel").textContent = `${capitalize(info.unit)} actuel`;
     emojiInput.placeholder = info.defaultEmoji;
-    $("trackingField").hidden = selectedType() !== "anime";
+    $("trackingField").hidden = info.seasons !== "optional";
     $("seasonField").hidden = !tracksSeasons();
   };
 
@@ -77,7 +80,7 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
     editingId = entry?.id ?? null;
     editingTitle = entry?.title ?? "";
 
-    heading.textContent = isEdit ? "Modifier la série" : "Nouvelle série";
+    heading.textContent = isEdit ? "Modifier l’œuvre" : "Nouvelle œuvre";
     $("entrySave").textContent = isEdit ? "Enregistrer" : "Ajouter";
     titleInput.value = entry?.title ?? "";
     emojiInput.value = entry?.emoji ?? "";
@@ -115,7 +118,7 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
     ev.preventDefault();
     const title = titleInput.value.trim();
     const emoji = emojiInput.value.trim();
-    if (!title) return showError("Donne un titre à la série.", titleInput);
+    if (!title) return showError("Donne un titre à l’œuvre.", titleInput);
     if (emoji && !isSingleEmoji(emoji)) {
       return showError("Un seul emoji, ou laisse vide pour garder celui par défaut.", emojiInput);
     }
@@ -137,7 +140,7 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
   $("editDelete").addEventListener("click", async () => {
     const id = editingId;
     const confirmed = await confirmDialog({
-      title: "Supprimer cette série ?",
+      title: "Supprimer cette œuvre ?",
       message: `« ${editingTitle} » et sa progression seront définitivement supprimées.`,
       confirmLabel: "Supprimer",
     });

@@ -62,12 +62,12 @@ interface Highlight {
 function render(highlight?: Highlight): void {
   const n = entries.length;
   $("count").textContent =
-    n === 0 ? "Rien à suivre pour l’instant" : `${n} ${plural(n, "série")} ${plural(n, "suivie")}`;
+    n === 0 ? "Rien à suivre pour l’instant" : `${n} ${plural(n, "œuvre")} ${plural(n, "suivie")}`;
 
   const list = $("list");
   if (n === 0) {
     list.innerHTML =
-      '<div class="empty"><p>Aucune série suivie.<br>Ajoute ta première avec le bouton + en haut.</p></div>';
+      '<div class="empty"><p>Aucune œuvre suivie.<br>Ajoute ta première avec le bouton + en haut.</p></div>';
     return;
   }
 
@@ -143,7 +143,7 @@ function incrementProgress(card: HTMLElement, plusBtn: HTMLElement, entry: Entry
 
 // Passer à la saison suivante = saison + 1 et retour à l'épisode 1, après confirmation.
 async function nextSeason(entry: Entry): Promise<void> {
-  if (entry.season === null) return; // le lien n'existe que sur les animes suivis par saison
+  if (entry.season === null) return; // le lien n'existe que sur les séries suivies par saison
   const next = entry.season + 1;
   const confirmed = await confirmDialog({
     title: `Passer à la saison ${next} ?`,

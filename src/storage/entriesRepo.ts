@@ -1,5 +1,5 @@
-import type { Entry } from "../types";
-import { isSeriesType } from "../types";
+import type { Entry, SeasonTracking } from "../types";
+import { SERIES_TYPES, isSeriesType } from "../types";
 import { isSingleEmoji } from "../emoji";
 import { isRecord, keysStartingWith, parseJson, readItem, removeItem, writeItem } from "./localStore";
 
@@ -12,7 +12,9 @@ const BACKUP_KEY = "tsuzuku:entries:backup";
 // Format stocké et exporté : { version, entries }. À incrémenter si le format change,
 // en ajoutant la migration correspondante dans parseEntries.
 // v1 → v2 : ajout de `season` (absent = suivi en épisodes seuls).
-const SCHEMA_VERSION = 2;
+// v2 → v3 : ajout du type "tv" (séries). Rien à migrer, mais une version de l'app qui ne
+// connaît pas ce type refusera ainsi clairement une sauvegarde qui en contient.
+const SCHEMA_VERSION = 3;
 
 export interface LoadedEntries {
   entries: Entry[];
@@ -118,12 +120,21 @@ function toEntry(value: unknown): Entry | null {
     type,
     // On compte à partir de 1 (chapitre, épisode, saison) : d'anciennes données à 0 sont remontées à 1.
     progress: Math.max(1, progress),
-    // Seuls les animes se suivent par saison ; sans saison valide, l'anime est suivi en épisodes seuls.
-    season: type === "anime" && isCount(season) ? Math.max(1, season) : null,
+    season: toSeason(SERIES_TYPES[type].seasons, season),
     // Un emoji invalide n'empêche pas l'import : on retombe sur l'emoji par défaut.
     emoji: typeof emoji === "string" && isSingleEmoji(emoji) ? emoji : "",
     updatedAt: typeof updatedAt === "number" && Number.isFinite(updatedAt) ? updatedAt : 0,
   };
+}
+
+/**
+ * Saison selon le suivi du type : jamais de saison, saison facultative (sans saison valide,
+ * suivi en épisodes seuls) ou saison obligatoire (sans saison valide, saison 1).
+ */
+function toSeason(tracking: SeasonTracking, season: unknown): number | null {
+  if (tracking === "never") return null;
+  if (isCount(season)) return Math.max(1, season);
+  return tracking === "always" ? 1 : null;
 }
 
 /** Entier positif ou nul (0 est accepté pour les anciennes données, puis remonté à 1). */

@@ -66,8 +66,8 @@ export function initSettingsView(initial: Settings, deps: SettingsViewDeps): Set
     const n = deps.getEntries().length;
     $("dataSummary").textContent =
       n === 0
-        ? "Aucune série enregistrée sur cet appareil."
-        : `${n} ${plural(n, "série")} ${plural(n, "enregistrée")} sur cet appareil.`;
+        ? "Aucune œuvre enregistrée sur cet appareil."
+        : `${n} ${plural(n, "œuvre")} ${plural(n, "enregistrée")} sur cet appareil.`;
 
     // Copies de données illisibles mises de côté au démarrage : seul moyen de les récupérer
     // sur iPhone, où l'on n'a pas accès aux outils de développement.
@@ -133,23 +133,23 @@ async function importEntries(file: File, deps: SettingsViewDeps): Promise<void> 
   }
 
   const current = deps.getEntries().length;
-  const currentLabel = current === 1 ? "ta série actuelle" : `tes ${current} séries actuelles`;
+  const currentLabel = current === 1 ? "ton œuvre actuelle" : `tes ${current} œuvres actuelles`;
   if (imported.length === 0) {
     // Une sauvegarde vide est acceptée (elle permet de repartir de zéro), mais on le dit clairement.
     if (current === 0) {
-      toast("Ce fichier ne contient aucune série.");
+      toast("Ce fichier ne contient aucune œuvre.");
       return;
     }
     const confirmed = await confirmDialog({
       title: "Vider ta liste ?",
-      message: `Ce fichier ne contient aucune série : l’importer effacera ${currentLabel}.`,
+      message: `Ce fichier ne contient aucune œuvre : l’importer effacera ${currentLabel}.`,
       confirmLabel: "Vider la liste",
     });
     if (!confirmed) return;
   } else if (current > 0) {
     const confirmed = await confirmDialog({
       title: "Remplacer ta liste ?",
-      message: `${capitalize(currentLabel)} ${current === 1 ? "sera remplacée" : "seront remplacées"} par ${imported.length === 1 ? "la série" : `les ${imported.length} séries`} du fichier.`,
+      message: `${capitalize(currentLabel)} ${current === 1 ? "sera remplacée" : "seront remplacées"} par ${imported.length === 1 ? "l’œuvre" : `les ${imported.length} œuvres`} du fichier.`,
       confirmLabel: "Remplacer",
     });
     if (!confirmed) return;
@@ -159,6 +159,6 @@ async function importEntries(file: File, deps: SettingsViewDeps): Promise<void> 
   toast(
     imported.length === 0
       ? "Liste vidée."
-      : `${imported.length} ${plural(imported.length, "série")} ${plural(imported.length, "importée")}.`,
+      : `${imported.length} ${plural(imported.length, "œuvre")} ${plural(imported.length, "importée")}.`,
   );
 }
