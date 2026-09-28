@@ -2,8 +2,10 @@
   position: fixed;
   left: 16px;
   right: 16px;
-  /* --viewport-gap : voir src/ui/viewport.ts. */
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px) - var(--viewport-gap, 0px));
+  /* Bien au-dessus de la barre d'accueil de l'iPhone, pour ne pas se perdre en bas de l'écran.
+     Volontairement sans --viewport-gap (src/ui/viewport.ts) : le bandeau n'a pas besoin de
+     descendre jusqu'au bord, au contraire. */
+  bottom: calc(32px + env(safe-area-inset-bottom, 0px));
   max-width: 448px;
   margin: 0 auto;
   background: var(--surface);

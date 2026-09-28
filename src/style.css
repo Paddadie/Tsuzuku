@@ -69,8 +69,8 @@
   display: none !important;
 }
 /* --viewport-gap : écart laissé par iOS sous la page de l'app installée (voir
-   src/ui/viewport.ts), 0 ailleurs. La page, la page Réglages, la sheet et le bandeau de
-   mise à jour s'étendent d'autant pour aller jusqu'en bas de l'écran. */
+   src/ui/viewport.ts), 0 ailleurs. La page, la page Réglages et la sheet s'étendent
+   d'autant pour aller jusqu'en bas de l'écran. */
 html {
   height: calc(100% + var(--viewport-gap, 0px));
   overflow: hidden;

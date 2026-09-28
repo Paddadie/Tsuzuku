@@ -4,8 +4,8 @@
 // alors une bande vide en bas, où la liste est coupée net, et la liste devient défilable
 // alors que tout tient à l'écran.
 // L'app installée occupe tout l'écran : l'écart entre la hauteur de l'écran et celle de la
-// page est exposé en CSS (--viewport-gap) pour étendre la page, la page Réglages, la sheet
-// et le bandeau de mise à jour jusqu'en bas. Sans ce défaut, l'écart vaut 0.
+// page est exposé en CSS (--viewport-gap) pour étendre la page, la page Réglages et la sheet
+// jusqu'en bas. Sans ce défaut, l'écart vaut 0.
 
 /** Vrai seulement pour l'app ajoutée à l'écran d'accueil sur iPhone / iPad. */
 const isIosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone === true;
