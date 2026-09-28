@@ -49,6 +49,14 @@ export function initEntryForm(deps: EntryFormDeps): EntryForm {
     $("seasonField").hidden = !tracksSeasons();
   };
 
+  // L'emoji par défaut est un placeholder : on le retire pendant la saisie pour que le champ
+  // se voie vide, et il revient en sortant si rien n'a été tapé. (En CSS, `color: transparent`
+  // ne masquerait pas un emoji, dessiné en couleur quelle que soit la couleur du texte.)
+  emojiInput.addEventListener("focus", () => {
+    emojiInput.placeholder = "";
+  });
+  emojiInput.addEventListener("blur", syncFormMode);
+
   const showError = (message: string, field?: HTMLInputElement): void => {
     errorEl.textContent = message;
     errorEl.hidden = !message;
