@@ -4,7 +4,7 @@ import pkg from "./package.json";
 
 // ⚠️ Doit correspondre exactement au nom de ton repo GitHub pour que
 // GitHub Pages serve les fichiers au bon chemin (https://<toi>.github.io/<repo>/).
-const REPO_NAME = "tsuzuku";
+const REPO_NAME = "Tsuzuku";
 
 // Couleur du fond sombre (--paper dans src/style.css), utilisée pour l'écran de lancement.
 const PAPER_DARK = "#1A1611";
